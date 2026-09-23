@@ -1,0 +1,47 @@
+# ==========================================================
+#  ज्ञानदायिनी महिला महाविद्यालय — Apache config (Hostinger)
+# ==========================================================
+Options -Indexes
+DirectoryIndex index.php index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # https rewrite - production ke liye (localhost par ignore hoga)
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP_HOST} !^localhost [NC]
+  RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # /page/about-college  ->  page.php?slug=about-college
+  RewriteRule ^page/([A-Za-z0-9_-]+)/?$ page.php?slug=$1 [L,QSA]
+</IfModule>
+
+# config folder ko browser se band rakho
+<FilesMatch "^(config\.php|db\.php)$">
+  Require all denied
+</FilesMatch>
+
+# Compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json image/svg+xml
+</IfModule>
+
+# Browser cache
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png  "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType text/css   "access plus 1 week"
+  ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+ErrorDocument 404 /page.php
